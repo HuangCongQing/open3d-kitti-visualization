@@ -51,6 +51,7 @@ def get_arrow(scale=10):
 	cylinder_height = scale*0.8
 	cone_radius = scale/10
 	cylinder_radius = scale/20
+	# 定义一个箭头
 	mesh_frame = o3d.geometry.TriangleMesh.create_arrow(cone_radius=0.4,
 		cone_height=cone_height,
 		cylinder_radius=0.1,
@@ -78,8 +79,12 @@ def create_arrow(origin=[0,0,0],end=None,color = None, vec=None):
 		gamma,beta = calculate_zy_rotation_for_arrow(vec)
 	mesh = get_arrow(scale)
 	# mesh.transform(T)
-	mesh.rotate([0,beta,0],center=False)
-	mesh.rotate([0,0,gamma],center=False)
+	# mesh.rotate([0,beta,0],center=False) # TypeError: rotate(): incompatible function arguments. The following argument types are supported:
+	# mesh.rotate([0,0,gamma],center=False)
+	# fix:w维度不对 np.expand_dims(np.array([0,beta,0], dtype=np.float64),1).shape
+	mesh.rotate(mesh.get_rotation_matrix_from_xyz((0,beta,0)), center=mesh.get_center())
+	mesh.rotate(mesh.get_rotation_matrix_from_xyz((0,0,gamma)), center=mesh.get_center())
+
 	mesh.translate(origin)
 
 	# add color
